@@ -1,0 +1,78 @@
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>This is a status page</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
+
+  <!-- Load jQuery -->
+  <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+</head>
+<body>
+<div class="container">
+  <div class="row">
+    <select class="dropdown-menu" id="namespaces" onchange="changeNamespace()">
+    </select>
+  </div>
+  <div class="row data">
+  </div>
+</div>
+
+<script>
+  var dropdownTemplate = '<option>%NAMESPACE%</a>';
+  var namespaceTemplate =
+      '<div class="col-12">' +
+      '<p><h1>%NAMESPACE%</h1></p>' +
+      '<table class="table">' +
+      '<tbody>' +
+      '%TRS%' +
+      '</tbody>' +
+      '</table>' +
+      '</div>';
+  var moduleTemplate =
+      '<tr>' +
+      '<td>' +
+      '<b>name:</b> %NAME%<br/>' +
+      '<b>version:</b> %VERSION%<br/>' +
+      '%DOMAIN%'
+      '</td>' +
+      '</tr>';
+  $.get( "/status").done(function( data ) {
+    try{
+      var namespaces = '';
+      var ddlNamespaces = '';
+      data.forEach(function(namespace) {
+        var trs = '';
+        var modules = namespace.modules;
+        modules.forEach(function(module) {
+          var moduleString = moduleTemplate.replace('%NAME%', module.name);
+          moduleString = moduleString.replace('%VERSION%', module.version);
+          if(module.domain !== ''){
+            moduleString = moduleString.replace('%DOMAIN%', '<b>domain:</b>  ' + module.domain + '<br/>');
+          }else {
+            moduleString = moduleString.replace('%DOMAIN%', '');
+          }
+          trs = trs + moduleString;
+        });
+
+        var namespaceString = namespaceTemplate.replace("%NAMESPACE%", namespace.name);
+        namespaceString = namespaceString.replace("%TRS%", trs);
+        namespaces = namespaces + namespaceString;
+
+        var ddlNamespaceString = dropdownTemplate.replace(/%NAMESPACE%/g, namespace.name);
+        ddlNamespaces = ddlNamespaces + ddlNamespaceString;
+      });
+
+      $( "div.data" ).html(namespaces);
+      $( "select.dropdown-menu" ).html(ddlNamespaces);
+    }catch (e) {
+      console.log(e.message);
+    }
+  });
+  
+  function changeNamespace() {
+    alert($("#namespaces option:selected").text())
+  }
+</script>
+</body>
+</html>

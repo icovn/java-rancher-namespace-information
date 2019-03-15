@@ -1,0 +1,12 @@
+server:
+  port: ${OPEN_PORT}
+
+application:
+  rancher:
+    accounts:
+      - url: ${APPLICATION_RANCHER_URL_DEV}
+        access-key: ${APPLICATION_RANCHER_ACCESS_KEY_DEV}
+        secret-key: ${APPLICATION_RANCHER_SECRET_KEY_DEV}
+      - url: ${APPLICATION_RANCHER_URL_PRODUCTION}
+        access-key: ${APPLICATION_RANCHER_ACCESS_KEY_PRODUCTION}
+        secret-key: ${APPLICATION_RANCHER_SECRET_KEY_PRODUCTION}
