@@ -11,18 +11,35 @@
 <body>
 <div class="container">
   <div class="row">
-    <select class="dropdown-menu" id="namespaces" onchange="changeNamespace()">
-    </select>
+    <div class="col-12">
+      <div class="form-group">
+        <label for="namespaces">Environment</label>
+        <select id="namespaces" class="form-control namespaces-list" onchange="changeNamespace()" style="display: block">
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12">
+      <div id="loading-image">
+        <img src="/status/images/loading.gif" alt="loading" />
+      </div>
+    </div>
   </div>
   <div class="row data">
   </div>
 </div>
 
 <script>
+  // $('#loading_div').hide().ajaxStart(function(){
+  //   $(this).show();
+  // }).ajaxStop(function() {
+  //   $(this).hide();
+  // });
+
   var dropdownTemplate = '<option>%NAMESPACE%</a>';
   var namespaceTemplate =
-      '<div class="col-12">' +
-      '<p><h1>%NAMESPACE%</h1></p>' +
+      '<div class="col-12 namespaces %NAMESPACE%" >' +
       '<table class="table">' +
       '<tbody>' +
       '%TRS%' +
@@ -37,6 +54,8 @@
       '%DOMAIN%'
       '</td>' +
       '</tr>';
+
+  $('#loading-image').show();
   $.get( "/status").done(function( data ) {
     try{
       var namespaces = '';
@@ -55,23 +74,32 @@
           trs = trs + moduleString;
         });
 
-        var namespaceString = namespaceTemplate.replace("%NAMESPACE%", namespace.name);
+        var namespaceString = namespaceTemplate.replace(/%NAMESPACE%/g, namespace.name);
         namespaceString = namespaceString.replace("%TRS%", trs);
         namespaces = namespaces + namespaceString;
 
         var ddlNamespaceString = dropdownTemplate.replace(/%NAMESPACE%/g, namespace.name);
         ddlNamespaces = ddlNamespaces + ddlNamespaceString;
       });
+      ddlNamespaces = ddlNamespaces + "<option selected>All</a>";
 
       $( "div.data" ).html(namespaces);
-      $( "select.dropdown-menu" ).html(ddlNamespaces);
+      $( "select.namespaces-list" ).html(ddlNamespaces);
+
+      $('#loading-image').hide();
     }catch (e) {
       console.log(e.message);
     }
   });
   
   function changeNamespace() {
-    alert($("#namespaces option:selected").text())
+    var selectedValue = $("#namespaces option:selected").text();
+    if(selectedValue === "All"){
+      $(".namespaces").show();
+    }else{
+      $(".namespaces").hide();
+      $("." + $("#namespaces option:selected").text()).show();
+    }
   }
 </script>
 </body>
